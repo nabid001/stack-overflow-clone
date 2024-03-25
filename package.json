@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^4.29.9",
     "@tailwindcss/typography": "github:tailwindcss/typography",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
@@ -16,10 +17,13 @@
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-tailwindcss": "^3.15.1",
     "lucide-react": "^0.363.0",
+    "mongodb": "^6.5.0",
+    "mongoose": "^8.2.3",
     "next": "14.1.4",
     "prettier": "^3.2.5",
     "react": "^18",
     "react-dom": "^18",
+    "svix": "^1.21.0",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7"
   },
