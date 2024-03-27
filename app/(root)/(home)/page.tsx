@@ -1,16 +1,12 @@
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import Link from "next/link";
+import { SignedIn, UserProfile } from "@clerk/nextjs";
 import React from "react";
 
 const page = () => {
   return (
-    <div className="h1-bold flex-center min-h-screen flex-col gap-9">
+    <div className=" flex-center min-h-screen flex-col gap-9">
       Home
-      <SignedOut>
-        <Link href="/sign-up">Sign Up</Link>
-      </SignedOut>
       <SignedIn>
-        <UserButton />
+        <UserProfile />
       </SignedIn>
     </div>
   );
