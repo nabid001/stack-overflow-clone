@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -140,6 +141,7 @@ const Question = ({ type, mongoUserId }: Props) => {
                 <Editor
                   apiKey={process.env.NEXT_PUBLIC_TINY_API_KEY}
                   onInit={(evt, editor) => {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     editorRef.current = editor;
                   }}

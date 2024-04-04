@@ -3,15 +3,14 @@
 import Question from "@/database/question.model";
 import { connectToDatabase } from "../mongoose";
 import Tag from "@/database/tag.model";
-import User, { IUser } from "@/database/user.model";
+import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
-import { Schema } from "mongoose";
 
 type CreateQuestionProps = {
   title: string;
   content: string;
   tags: string[];
-  author: Schema.Types.ObjectId | IUser;
+  author: string
   path: string;
 };
 
