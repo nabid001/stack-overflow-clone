@@ -5,7 +5,7 @@ import { connectToDatabase } from "../mongoose";
 import { CreateUserParams, DeleteUserParams, UpdateUserParams } from "@/types/shared.types";
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
-import Tag from "@/database/tag.model";
+
 
 export const getUserById = async (clerkId: string) => {
   try {
@@ -65,11 +65,11 @@ export async function deleteUser(params: DeleteUserParams) {
     // and questions, answers, comments, etc.
 
     // get user question ids
-    const userQuestionIds = await Question.find({ author: user._id}).distinct('_id');
+    // const userQuestionIds = await Question.find({ author: user._id}).distinct('_id');
 
     // delete user questions
     await Question.deleteMany({ author: user._id });
-    await Tag.deleteMany({questions: { $in: userQuestionIds}});
+    // await Tag.deleteMany({questions: { $in: userQuestionIds}});
 
     // TODO: delete user answers, comments, etc.
 
