@@ -28,10 +28,10 @@ const topQuestions = [
 ];
 
 const renderTag = [
-  { _id: 1, name: "Next.js", topQuestions: 2 },
-  { _id: 1, name: "Next.js", topQuestions: 2 },
-  { _id: 1, name: "Next.js", topQuestions: 2 },
-  { _id: 1, name: "Next.js", topQuestions: 2 },
+  { _id: "1", name: "Next.js", topQuestions: 2 },
+  { _id: "1", name: "Next.js", topQuestions: 2 },
+  { _id: "1", name: "Next.js", topQuestions: 2 },
+  { _id: "1", name: "Next.js", topQuestions: 2 },
 ];
 
 const RightSidebar = () => {
