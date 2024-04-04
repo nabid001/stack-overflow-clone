@@ -2,8 +2,7 @@
 
 import User from "@/database/user.model";
 import { connectToDatabase } from "../mongoose";
-import { CreateUserProps } from "@/types";
-import { DeleteUserParams, UpdateUserParams } from "@/types/shared.types";
+import { CreateUserParams, DeleteUserParams, UpdateUserParams } from "@/types/shared.types";
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
 
@@ -19,63 +18,64 @@ export const getUserById = async (clerkId: string) => {
     throw error
   }
 };
-
-export const createUser = async (user: CreateUserProps) => {
+export async function createUser(userData: CreateUserParams) {
   try {
-    await connectToDatabase();
+    connectToDatabase();
 
-    const newUser = await User.create(user);
+    const newUser = await User.create(userData);
 
-    return JSON.parse(JSON.stringify(newUser));
+    return newUser;
   } catch (error) {
     console.log(error);
-    throw error
+    throw error;
   }
-};
+}
 
-export const updateUser = async (params: UpdateUserParams) => {
+export async function updateUser(params: UpdateUserParams) {
   try {
-    await connectToDatabase();
-    const {clerkId, updateData, path} = params
+    connectToDatabase();
 
-    if(!clerkId) throw new Error("User not found");
+    const { clerkId, updateData, path } = params;
 
-    const updatedUser = await User.findOneAndUpdate({clerkId}, updateData, {
-      new: true
-    })
+    await User.findOneAndUpdate({ clerkId }, updateData, {
+      new: true,
+    });
 
-    revalidatePath(path)
-    return JSON.parse(JSON.stringify(updatedUser));
+    revalidatePath(path);
   } catch (error) {
     console.log(error);
-    throw error
+    throw error;
   }
-};
+}
 
-export const deleteUser = async (params: DeleteUserParams) => {
+export async function deleteUser(params: DeleteUserParams) {
   try {
-    await connectToDatabase();
-    const {clerkId} = params
+    connectToDatabase();
 
-    if(!clerkId) throw new Error("clerkId not found");
+    const { clerkId } = params;
 
-    const user = await User.findOneAndDelete({clerkId});
+    const user = await User.findOneAndDelete({ clerkId });
 
-    if(!user) throw new Error("User not found")
+    if(!user) {
+      throw new Error('User not found');
+    }
 
     // Delete user from database
     // and questions, answers, comments, etc.
 
     // get user question ids
-    // const userQuestionIds = await Question.find({author: user._id}).distinct("_id");
+    // const userQuestionIds = await Question.find({ author: user._id}).distinct('_id');
 
-    await Question.deleteMany({author: user._id});
+    // delete user questions
+    await Question.deleteMany({ author: user._id });
+
+    // TODO: delete user answers, comments, etc.
 
     const deletedUser = await User.findByIdAndDelete(user._id);
 
-    return deletedUser
+    return deletedUser;
   } catch (error) {
     console.log(error);
-    throw error
+    throw error;
   }
-};
+}

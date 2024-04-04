@@ -50,7 +50,7 @@ const page = async () => {
               key={question._id}
               _id={question._id}
               title={question.title}
-              author={question.author}
+              author={question?.author}
               tags={question.tags}
               upvotes={question.upvotes}
               views={question.views}
