@@ -43,11 +43,11 @@ export const getTimestamp = (createdAt: Date): string => {
 
 export const formatAndDivideNumber = (number: number): string => {
   if (number >= 1e9) {
-    return (number / 1e9).toFixed(2) + "B";
+    return (number / 1e9).toFixed(1) + "B";
   } else if (number >= 1e6) {
-    return (number / 1e6).toFixed(2) + "M";
+    return (number / 1e6).toFixed(1) + "M";
   } else if (number >= 1e3) {
-    return (number / 1e3).toFixed(2) + "K";
+    return (number / 1e3).toFixed(1) + "K";
   } else {
     return number.toString();
   }

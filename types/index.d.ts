@@ -6,6 +6,14 @@ export interface SidebarLink {
   label: string;
 }
 
+export type CreateUserProps = {
+  clerkId: string,
+  name: string,
+  username: string,
+  email: string,
+  picture: string
+}
+
 export interface Job {
   id?: string;
   employer_name?: string;

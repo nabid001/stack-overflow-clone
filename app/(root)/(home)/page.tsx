@@ -6,49 +6,13 @@ import QuestionCard from "@/components/shared/card/QuestionCard";
 import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
 import { Button } from "@/components/ui/button";
 import { HomePageFilters } from "@/constants/filters";
+
+import { getQuestion } from "@/lib/actions/question.action";
 import Link from "next/link";
 
-const questions = [
-  {
-    _id: "1",
-    title:
-      "Best practices for data fetching in a Next.js application with Server-Side Rendering (SSR)?",
-    tags: [
-      { _id: "101", name: "Next.js" },
-      { _id: "102", name: "React" },
-    ],
-    author: {
-      _id: "201",
-      name: "John Doe",
-      picture: "/avatar.jpg",
-      clerkId: "3828f2s",
-    },
-    upvotes: ["10"],
-    views: 100,
-    answers: [],
-    createdAt: new Date("2024-03-12T12:00:00"),
-  },
-  {
-    _id: "1",
-    title: "How to center a div in CSS?",
-    tags: [
-      { _id: "101", name: "Next.js" },
-      { _id: "102", name: "React" },
-    ],
-    author: {
-      _id: "201",
-      name: "John Doe",
-      picture: "/avatar.jpg",
-      clerkId: "3828f2",
-    },
-    upvotes: ["10"],
-    views: 100,
-    answers: [],
-    createdAt: new Date("2024-03-12T12:00:00"),
-  },
-];
+const page = async () => {
+  const result = await getQuestion();
 
-const page = () => {
   return (
     <>
       <div className="flex w-full flex-col-reverse justify-between sm:flex-row sm:items-center">
@@ -80,8 +44,8 @@ const page = () => {
       <HomeFilters />
 
       <div className="mt-11 flex w-full flex-col gap-6">
-        {questions.length > 0 ? (
-          questions.map((question) => (
+        {result?.question?.length > 0 ? (
+          result?.question.map((question) => (
             <QuestionCard
               key={question._id}
               _id={question._id}

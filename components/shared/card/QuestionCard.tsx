@@ -24,7 +24,6 @@ interface QuestionProps {
 }
 
 const QuestionCard = ({
-  clerkId,
   _id,
   title,
   tags,
@@ -47,6 +46,7 @@ const QuestionCard = ({
             </h3>
           </Link>
         </div>
+        {/* TODO: add delete and update icon and functionality */}
       </div>
 
       <div className="mt-3.5 flex flex-wrap gap-2">

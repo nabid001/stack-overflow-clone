@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
 type Props = {
-  _id: number;
+  _id: string;
   name: string;
   topQuestions?: number;
   showCount?: boolean;
