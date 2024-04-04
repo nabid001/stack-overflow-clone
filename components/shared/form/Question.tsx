@@ -60,8 +60,8 @@ const Question = ({ type, mongoUserId }: Props) => {
       throw error;
     } finally {
       setIsSubmitting(false);
-      form.reset();
       router.push("/");
+      form.reset();
     }
   }
 

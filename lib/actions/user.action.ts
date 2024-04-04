@@ -69,7 +69,7 @@ export async function deleteUser(params: DeleteUserParams) {
 
     // delete user questions
     await Question.deleteMany({ author: user._id });
-    await Tag.deleteMany({questions: userQuestionIds});
+    await Tag.deleteMany({questions: { $in: userQuestionIds}});
 
     // TODO: delete user answers, comments, etc.
 
