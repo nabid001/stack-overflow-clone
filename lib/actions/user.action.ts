@@ -2,10 +2,14 @@
 
 import User from "@/database/user.model";
 import { connectToDatabase } from "../mongoose";
-import { CreateUserParams, DeleteUserParams, UpdateUserParams } from "@/types/shared.types";
+import {
+  CreateUserParams,
+  DeleteUserParams,
+  GetAllUsersParams,
+  UpdateUserParams,
+} from "@/types/shared.types";
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
-
 
 export const getUserById = async (clerkId: string) => {
   try {
@@ -16,7 +20,7 @@ export const getUserById = async (clerkId: string) => {
     return JSON.parse(JSON.stringify(user));
   } catch (error) {
     console.log(error);
-    throw error
+    throw error;
   }
 };
 export async function createUser(userData: CreateUserParams) {
@@ -57,8 +61,8 @@ export async function deleteUser(params: DeleteUserParams) {
 
     const user = await User.findOneAndDelete({ clerkId });
 
-    if(!user) {
-      throw new Error('User not found');
+    if (!user) {
+      throw new Error("User not found");
     }
 
     // Delete user from database
@@ -81,3 +85,19 @@ export async function deleteUser(params: DeleteUserParams) {
     throw error;
   }
 }
+
+export const getAllUser = async ( params: GetAllUsersParams) => {
+  try {
+    await connectToDatabase();
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { page = 1, pageSize = 20, filter, searchQuery } = params
+
+    const users = await User.find().sort({createdAt: -1})
+
+    return { users };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};

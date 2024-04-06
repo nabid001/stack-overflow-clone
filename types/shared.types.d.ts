@@ -104,8 +104,8 @@ export interface GetQuestionsByTagIdParams {
   searchQuery?: string;
 }
 
-export interface GetTopInteractedTagsParams {
-  userId: string;
+export type GetTopInteractedTagsParams = {
+  clerkId: string;
   limit?: number;
 }
 

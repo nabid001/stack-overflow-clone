@@ -163,10 +163,3 @@ code {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
-
-.auth-bg-dark {
-  background-image: url("/public/assets/images/auth-dark.png");
-}
-.auth-bg-light {
-  background-image: url("/public/assets/images/auth-light.png");
-}

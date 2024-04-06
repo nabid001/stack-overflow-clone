@@ -18,7 +18,7 @@ const NoResult = ({ title, description, link, linkTitle }: Props) => {
         alt="no-result"
         width={270}
         height={200}
-        className=" hidden object-contain dark:flex"
+        className="hidden object-contain dark:flex"
       />
 
       <Image

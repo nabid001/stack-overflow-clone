@@ -32,7 +32,11 @@ const Filters = ({ containerClasses, filters, otherClasses }: Props) => {
         <SelectContent className="">
           <SelectGroup>
             {filters.map((item) => (
-              <SelectItem key={item.value} value={item.value}>
+              <SelectItem
+                key={item.value}
+                value={item.value}
+                className="text-dark300_light700"
+              >
                 {item.name}
               </SelectItem>
             ))}
