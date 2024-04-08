@@ -54,3 +54,26 @@ export interface BadgeCounts {
 }
 
 export type BadgeCriteriaType = keyof typeof BADGE_CRITERIA;
+
+export type TagProps = {
+  _id: string;
+  name: string;
+};
+
+export type VoteProps = {
+  type: string;
+  itemId: string;
+  userId: string;
+  upvotes: number;
+  hasupvote: boolean;
+  downvotes: number;
+  hasdownvote: boolean;
+  hasSaved?: boolean;
+};
+
+export type ToggleSaveQuestionProps = {
+  userId: string;
+  questionId: string;
+  hasSaved: boolean;
+  path: string;
+}

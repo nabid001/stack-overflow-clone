@@ -6,10 +6,12 @@ import {
   CreateUserParams,
   DeleteUserParams,
   GetAllUsersParams,
+  ToggleSaveQuestionParams,
   UpdateUserParams,
 } from "@/types/shared.types";
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
+import Tag from "@/database/tag.model";
 
 export const getUserById = async (clerkId: string) => {
   try {
@@ -17,7 +19,7 @@ export const getUserById = async (clerkId: string) => {
 
     const user = await User.findOne({ clerkId });
 
-    return JSON.parse(JSON.stringify(user));
+    return user
   } catch (error) {
     console.log(error);
     throw error;
@@ -69,11 +71,14 @@ export async function deleteUser(params: DeleteUserParams) {
     // and questions, answers, comments, etc.
 
     // get user question ids
-    // const userQuestionIds = await Question.find({ author: user._id}).distinct('_id');
+    const userQuestionIds = await Question.find({ author: user._id}).distinct('_id');
 
     // delete user questions
     await Question.deleteMany({ author: user._id });
-    // await Tag.deleteMany({questions: { $in: userQuestionIds}});
+    await Tag.updateMany(
+      {},
+      { $pull: { questions: { userQuestionIds }}}
+    )
 
     // TODO: delete user answers, comments, etc.
 
@@ -101,3 +106,38 @@ export const getAllUser = async ( params: GetAllUsersParams) => {
     throw error;
   }
 };
+
+export async function toggleSaveQuestion(params: ToggleSaveQuestionParams) {
+  try {
+    connectToDatabase();
+
+    const { userId, questionId, path } = params;
+
+    const user = await User.findById(userId);
+
+    if(!user) {
+      throw new Error('User not found');
+    }
+
+    const isQuestionSaved = user.saved.includes(questionId);
+
+    if(isQuestionSaved) {
+      // remove question from saved
+      await User.findByIdAndUpdate(userId, 
+        { $pull: { saved: questionId }},
+        { new: true }
+      )
+    } else {
+      // add question to saved
+      await User.findByIdAndUpdate(userId, 
+        { $addToSet: { saved: questionId }},
+        { new: true }
+      )
+    }
+
+    revalidatePath(path)
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}

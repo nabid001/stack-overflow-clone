@@ -41,7 +41,7 @@ export const getTimestamp = (createdAt: Date): string => {
   }
 };
 
-export const formatAndDivideNumber = (number: number): string => {
+export const formatAndDivideNumber = (number: number): number | string => {
   if (number >= 1e9) {
     return (number / 1e9).toFixed(1) + "B";
   } else if (number >= 1e6) {
@@ -49,6 +49,6 @@ export const formatAndDivideNumber = (number: number): string => {
   } else if (number >= 1e3) {
     return (number / 1e3).toFixed(1) + "K";
   } else {
-    return number.toString();
+    return number
   }
 };

@@ -20,7 +20,7 @@ type Props = {
 
 const Filters = ({ containerClasses, filters, otherClasses }: Props) => {
   return (
-    <div className={` relative ${containerClasses} `}>
+    <div className={`relative ${containerClasses}`}>
       <Select>
         <SelectTrigger
           className={`body-regular light-border background-light800_dark300 text-dark500_light700 border px-5 py-2.5 ${otherClasses}`}
