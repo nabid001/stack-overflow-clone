@@ -3,7 +3,7 @@ import { formatAndDivideNumber, getTimestamp } from "@/lib/utils";
 import RenderTag from "../RenderTag";
 import Metric from "../Metric";
 
-interface QuestionProps {
+export interface QuestionProps {
   _id: string;
   title: string;
   tags: {
