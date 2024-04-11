@@ -144,7 +144,7 @@ export async function toggleSaveQuestion(params: ToggleSaveQuestionParams) {
   }
 }
 
-export const getSavedQuestion = async ({clerkId, page = 1, filter, pageSize = 20, searchQuery}: GetSavedQuestionsParams) => {
+export const getSavedQuestion = async ({clerkId, searchQuery}: GetSavedQuestionsParams) => {
   try {
     await connectToDatabase();
 
