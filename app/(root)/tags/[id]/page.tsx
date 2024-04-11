@@ -3,7 +3,7 @@ import QuestionCard, {
   QuestionProps,
 } from "@/components/shared/card/QuestionCard";
 import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
-import { getRelatedTags } from "@/lib/actions/tag.action";
+import { getQuestionByTagId } from "@/lib/actions/tag.action";
 
 import React from "react";
 
@@ -11,10 +11,17 @@ type Props = {
   params: {
     id: string;
   };
+  searchParams: {
+    q: string;
+  };
 };
 
-const page = async ({ params: { id } }: Props) => {
-  const result = await getRelatedTags(id);
+const page = async ({ params: { id }, searchParams }: Props) => {
+  /* TODO: add searchParams to getQuestionByTagId */
+  const result = await getQuestionByTagId({
+    tagId: id,
+    searchQuery: searchParams.q,
+  });
 
   return (
     <>
@@ -47,10 +54,10 @@ const page = async ({ params: { id } }: Props) => {
           ))
         ) : (
           <NoResult
-            title="You haven't saved any questions yet."
+            title="There is no question to show"
             description="Save questions to see them here."
-            link="/"
-            linkTitle="Explore Questions"
+            link="/ask-question"
+            linkTitle="Ask a Question"
           />
         )}
       </div>
