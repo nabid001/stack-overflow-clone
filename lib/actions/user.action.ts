@@ -144,6 +144,7 @@ export async function toggleSaveQuestion(params: ToggleSaveQuestionParams) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getSavedQuestion = async ({clerkId, page = 1, filter, pageSize = 20, searchQuery}: GetSavedQuestionsParams) => {
   try {
     await connectToDatabase();

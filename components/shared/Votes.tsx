@@ -8,10 +8,11 @@ import {
 import { formatAndDivideNumber } from "@/lib/utils";
 import { VoteProps } from "@/types";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import React from "react";
+import { usePathname, useRouter } from "next/navigation";
+import React, { useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { toggleSaveQuestion } from "@/lib/actions/user.action";
+import { viewQuestoins } from "@/lib/actions/interaction.action";
 
 const Votes = ({
   type,
@@ -25,6 +26,18 @@ const Votes = ({
 }: VoteProps) => {
   const { toast } = useToast();
   const path = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    const main = async () => {
+      await viewQuestoins({
+        questionId: JSON.parse(itemId),
+        userId: userId ? JSON.parse(userId) : undefined,
+      });
+    };
+
+    main();
+  }, [path, router, userId, itemId]);
 
   const handleVote = async (action: string) => {
     if (!userId) {
