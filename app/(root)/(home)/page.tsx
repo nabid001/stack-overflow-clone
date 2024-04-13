@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 import { HomePageFilters } from "@/constants/filters";
 
 import { getQuestion } from "@/lib/actions/question.action";
+import { auth } from "@clerk/nextjs";
 import Link from "next/link";
 
 const page = async () => {
+  const { userId } = auth();
   const result = await getQuestion({
     page: 1,
     pageSize: 20,
@@ -52,6 +54,7 @@ const page = async () => {
             <QuestionCard
               key={question._id}
               _id={question._id}
+              clerkId={userId}
               title={question.title}
               author={question?.author}
               tags={question.tags}

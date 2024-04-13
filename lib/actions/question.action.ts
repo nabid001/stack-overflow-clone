@@ -5,7 +5,9 @@ import { connectToDatabase } from "../mongoose";
 import Tag from "@/database/tag.model";
 import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
-import { GetQuestionsParams, GetUserStatsParams, QuestionVoteParams } from "@/types/shared.types";
+import { DeleteQuestionParams, GetQuestionsParams, GetUserStatsParams, QuestionVoteParams } from "@/types/shared.types";
+import Answer from "@/database/answer.model";
+import Interaction from "@/database/interactive.model";
 
 type CreateQuestionProps = {
   title: string;
@@ -176,3 +178,21 @@ export const getQuestionByUserId = async ({userId, page = 1, pageSize = 10}: Get
     throw error;
   }
 };
+
+export const deleteQuestion = async ({questionId, path}: DeleteQuestionParams) => {
+  try {
+    await connectToDatabase();
+
+    await Question.deleteOne({_id: questionId});
+
+    await Answer.deleteMany({question: questionId})
+    await Tag.updateMany({questions: questionId}, { $pull: { questions: questionId } } );
+    await User.updateMany({saved: questionId}, { $pull: { saved: questionId } } );
+    await Interaction.deleteMany({question: questionId})
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log(error);
+    throw error
+  }
+}

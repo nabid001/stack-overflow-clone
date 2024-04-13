@@ -19,7 +19,7 @@ export const viewQuestoins = async ({questionId, userId}:ViewQuestionParams) => 
             question: questionId,
           })
     
-          if(existingInteraction) return
+          if(existingInteraction) return console.log('User has already viewed.')
     
           // Create interaction
           await Interaction.create({
