@@ -17,7 +17,9 @@ type Props = {
 };
 
 const AllAnswers = async ({ questionId, userId, totalAnswers }: Props) => {
-  const result = await getAnswerById({ questionId });
+  const result = await getAnswerById({
+    questionId: JSON.parse(questionId),
+  });
 
   return (
     <div className="mt-11">

@@ -14,6 +14,7 @@ import {
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
 import Tag from "@/database/tag.model";
+import Answer from "@/database/answer.model";
 
 export const getUserById = async (clerkId: string) => {
   try {
@@ -174,6 +175,30 @@ export const getSavedQuestion = async ({clerkId, page = 1, filter, pageSize = 20
 
     return { question: savedQuestion }
 
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getUserInfo = async ({userId}: {userId: string}) => {
+  try {
+    await connectToDatabase();
+
+    const user = await User.findOne({clerkId: userId})
+    
+    if(!user) {
+      throw new Error("User not found");
+    };
+
+    const totalQuestions = await Question.countDocuments({author: user._id})
+    const totalAnswers = await Answer.countDocuments({author: user._id})
+
+    return {
+      user,
+      totalQuestions,
+      totalAnswers,
+    }
   } catch (error) {
     console.log(error);
     throw error;

@@ -5,7 +5,7 @@ import { connectToDatabase } from "../mongoose";
 import Tag from "@/database/tag.model";
 import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
-import { QuestionVoteParams } from "@/types/shared.types";
+import { GetQuestionsParams, GetUserStatsParams, QuestionVoteParams } from "@/types/shared.types";
 
 type CreateQuestionProps = {
   title: string;
@@ -15,14 +15,18 @@ type CreateQuestionProps = {
   path: string;
 };
 
-export const getQuestion = async () => {
+export const getQuestion = async ({page = 1, pageSize = 20 }: GetQuestionsParams) => {
     try {
       await connectToDatabase();
+
+      const skip = (page - 1) * pageSize;
   
       const question = await Question.find()
         .populate({ path: "author", model: User })
         .populate({ path: "tags", model: Tag })
-        .sort({ createdAt: -1 }); 
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(pageSize);
   
       return { question };
     } catch (error) {
@@ -31,7 +35,6 @@ export const getQuestion = async () => {
     }
   };
   
-
 export const createQuestion = async ({ title, content, tags, author, path,
 }: CreateQuestionProps) => {
   try {
@@ -147,3 +150,29 @@ export const downvoteQuestion = async ({questionId, userId, hasdownVoted, hasupV
     throw error
   }
 }
+
+export const getQuestionByUserId = async ({userId, page = 1, pageSize = 10}: GetUserStatsParams) => {
+  try {
+    await connectToDatabase();
+
+    const totalQuestions = await Question.countDocuments({ author: userId });
+
+    const skip = (page - 1) * pageSize;
+
+    const userQuestions = await Question.find({ author: userId })
+      .sort({ views: -1, upvotes: -1 })
+      .populate({ path: "tags", model: Tag, select: "_id name" })
+      .populate({ path: "author", model: User, select: "_id name clerkId name picture" })
+      .skip(skip)
+      .limit(pageSize);
+
+    if(!userQuestions) {
+      throw new Error("there is no question")
+    }
+
+    return {totalQuestions, questions: userQuestions}
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};

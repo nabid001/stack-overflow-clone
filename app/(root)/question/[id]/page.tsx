@@ -112,12 +112,15 @@ const page = async ({ params: { id } }: Props) => {
       </div>
 
       <AllAnswers
-        questionId={id}
+        questionId={JSON.stringify(id)}
         userId={mongouser?._id}
         totalAnswers={answers?.length}
       />
 
-      <Answer questionId={_id.toString()} authorId={mongouser?._id} />
+      <Answer
+        questionId={JSON.stringify(_id)}
+        authorId={JSON.stringify(mongouser?._id)}
+      />
     </>
   );
 };

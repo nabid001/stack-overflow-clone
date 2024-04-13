@@ -5,7 +5,7 @@ import { connectToDatabase } from "../mongoose";
 import Question from "@/database/question.model";
 import { revalidatePath } from "next/cache";
 import User from "@/database/user.model";
-import { AnswerVoteParams, GetAnswersParams } from "@/types/shared.types";
+import { AnswerVoteParams, GetAnswersParams, GetUserStatsParams } from "@/types/shared.types";
 
 type Props = {
   content: string;
@@ -120,3 +120,29 @@ export const downvoteAnswer = async ({answerId, userId, hasdownVoted, hasupVoted
     throw error;
   }
 }
+
+export const getUserAnswer = async ({userId, page = 1, pageSize = 10}: GetUserStatsParams) => {
+  try {
+    await connectToDatabase();
+
+    const totalAnswers = await Answer.countDocuments({ author: userId });
+
+    const skip = (page - 1) * pageSize;
+
+    const userAnswers = await Answer.find({ author: userId })
+      .sort({ upvotes: - 1 })
+      .populate({ path: "author", model: User, select: "_id name clerkId name picture" })
+      .populate({ path: "question", model: Question, select: "_id title" })
+      .skip(skip)
+      .limit(pageSize);
+
+    if(!userAnswers) {
+      throw new Error("there is no answers")
+    }
+
+    return {totalAnswers, answers: userAnswers}
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};

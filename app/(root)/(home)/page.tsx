@@ -11,7 +11,10 @@ import { getQuestion } from "@/lib/actions/question.action";
 import Link from "next/link";
 
 const page = async () => {
-  const result = await getQuestion();
+  const result = await getQuestion({
+    page: 1,
+    pageSize: 20,
+  });
 
   return (
     <>
@@ -69,6 +72,8 @@ const page = async () => {
           />
         )}
       </div>
+
+      {/* Todo: Add pagination here  */}
     </>
   );
 };
