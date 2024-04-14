@@ -22,48 +22,74 @@ import { QuestionSchema } from "@/lib/validation";
 import React, { useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { createQuestion } from "@/lib/actions/question.action";
+import { usePathname, useRouter } from "next/navigation";
+import { createQuestion, editQuestion } from "@/lib/actions/question.action";
 import { useTheme } from "@/context/ThemeProvider";
 
 interface Props {
   type: string;
   mongoUserId: string;
+  questionDetails?: any;
 }
 
-const Question = ({ type, mongoUserId }: Props) => {
+const Question = ({ type, mongoUserId, questionDetails }: Props) => {
   const { mode } = useTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const editorRef = useRef(null);
-
   const router = useRouter();
+  const pathname = usePathname();
+
+  const parsedQuestionDetails =
+    questionDetails && JSON.parse(questionDetails || "");
+  const groupedTags = parsedQuestionDetails?.tags.map((tag: any) => tag.name);
 
   const form = useForm<z.infer<typeof QuestionSchema>>({
     resolver: zodResolver(QuestionSchema),
     defaultValues: {
-      title: "",
-      explanation: "",
-      tags: [],
+      title: parsedQuestionDetails?.title || "",
+      explanation: parsedQuestionDetails?.content || "",
+      tags: groupedTags || [],
     },
   });
 
   async function onSubmit(values: z.infer<typeof QuestionSchema>) {
-    setIsSubmitting(true);
-    try {
-      await createQuestion({
-        title: values.title,
-        content: values.explanation,
-        tags: values.tags,
-        author: mongoUserId,
-        path: "/",
-      });
-    } catch (error) {
-      console.log(error);
-      throw error;
-    } finally {
-      setIsSubmitting(false);
-      router.push("/");
-      form.reset();
+    if (type === "Create") {
+      setIsSubmitting(true);
+      try {
+        await createQuestion({
+          title: values.title,
+          content: values.explanation,
+          tags: values.tags,
+          author: mongoUserId,
+          path: pathname,
+        });
+      } catch (error) {
+        console.log(error);
+        throw error;
+      } finally {
+        setIsSubmitting(false);
+        router.push("/");
+        form.reset();
+      }
+    } else if (type === "Edit") {
+      setIsSubmitting(true);
+
+      try {
+        await editQuestion({
+          questionId: parsedQuestionDetails._id,
+          title: values.title,
+          content: values.explanation,
+          path: pathname,
+        });
+
+        form.reset();
+        router.push(`/question/${parsedQuestionDetails._id}`);
+      } catch (error) {
+        console.log(error);
+        throw error;
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   }
 
@@ -149,7 +175,9 @@ const Question = ({ type, mongoUserId }: Props) => {
                   }}
                   onBlur={field.onBlur}
                   onEditorChange={(content) => field.onChange(content)}
-                  initialValue=""
+                  initialValue={
+                    type === "Edit" ? parsedQuestionDetails?.content : ""
+                  }
                   init={{
                     height: 350,
                     menubar: false,
@@ -202,6 +230,7 @@ const Question = ({ type, mongoUserId }: Props) => {
                   <Input
                     className="background-light700_dark400 no-focus paragraph-regular light-border-2 text-dark400_light700 min-h-[56px] border"
                     onKeyDown={(e) => handleInputKeyDown(e, field)}
+                    disabled={type === "Edit"}
                   />
 
                   {field.value.length > 0 && (
@@ -212,24 +241,32 @@ const Question = ({ type, mongoUserId }: Props) => {
                           className="subtle-medium background-light800_dark300 text-light400_light500 flex items-center justify-center gap-2 rounded-md border-none px-4 py-2 capitalize"
                         >
                           {tag}
-
-                          <Image
-                            src="/assets/icons/close.svg"
-                            alt="close"
-                            width={12}
-                            height={12}
-                            onClick={() => handleRemoveTag(tag, field)}
-                            className="cursor-pointer object-contain invert-0 dark:invert"
-                          />
+                          {type === "Create" && (
+                            <Image
+                              src="/assets/icons/close.svg"
+                              alt="close"
+                              width={12}
+                              height={12}
+                              onClick={() =>
+                                type === "Create"
+                                  ? handleRemoveTag(tag, field)
+                                  : () => {}
+                              }
+                              className="cursor-pointer object-contain invert-0 dark:invert"
+                            />
+                          )}
                         </Badge>
                       ))}
                     </div>
                   )}
                 </>
               </FormControl>
-              <FormDescription className="body-regular mt-2.5 text-light-500">
-                Add up to 5 tags to describe what your question is about. Start
-                typing to see suggestions.
+              <FormDescription
+                className={`body-regular mt-2.5 text-light-500 ${type === "Edit" && "text-red-300"}`}
+              >
+                {type === "Create"
+                  ? "Add up to 5 tags to describe what your question is about. Start typing to see suggestions."
+                  : "Changing tags is not permitted."}
               </FormDescription>
               <FormMessage className="text-red-500" />
             </FormItem>

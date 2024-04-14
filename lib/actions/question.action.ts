@@ -8,12 +8,20 @@ import { revalidatePath } from "next/cache";
 import { DeleteQuestionParams, GetQuestionsParams, GetUserStatsParams, QuestionVoteParams } from "@/types/shared.types";
 import Answer from "@/database/answer.model";
 import Interaction from "@/database/interactive.model";
+import console from "console";
 
 type CreateQuestionProps = {
   title: string;
   content: string;
   tags: string[];
   author: string
+  path: string;
+};
+
+type EditQuestionProps = {
+  questionId: string;
+  title: string;
+  content: string;
   path: string;
 };
 
@@ -196,3 +204,22 @@ export const deleteQuestion = async ({questionId, path}: DeleteQuestionParams) =
     throw error
   }
 }
+
+export const editQuestion = async ({ questionId, title, content, path, }: EditQuestionProps) => {
+  try {
+    await connectToDatabase();
+
+    const question = await Question.findById(questionId).populate("tags");
+
+    if(!question) {
+      throw new Error("Question not found");
+    }
+
+    await Question.findByIdAndUpdate(questionId, { title, content }, { new: true });
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
