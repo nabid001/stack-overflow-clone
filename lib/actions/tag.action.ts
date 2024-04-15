@@ -74,9 +74,11 @@ export const getTopTags = async () => {
   try {
     await connectToDatabase();
 
-    const tag = await Tag.find()
-      .sort({questions: - 1})
-      .limit(5)
+    const tag = await Tag.aggregate([
+      {$project: { name: 1, numberOfQuestions: { $size: "$questions"}}},
+      { $sort: {numberOfQuestions : - 1}},
+      { $limit: 5}
+    ])
     
     return tag
   } catch (error) {
