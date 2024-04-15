@@ -204,3 +204,33 @@ export const getUserInfo = async ({userId}: {userId: string}) => {
     throw error;
   }
 };
+
+type UpdateUserProfileParams = {
+  clerkId: string;
+  name: string;
+  username: string;
+  location: string;
+  bio: string;
+  portfolioWebsite: string
+  pathname: string
+}
+export const updateUserProfile = async ({clerkId, name, username, location, bio, portfolioWebsite, pathname}: UpdateUserProfileParams) => {
+  try {
+    await connectToDatabase();
+    const user = await User.findOne({clerkId});
+    if(!user){
+      throw new Error("User not found")
+    }
+
+    await User.findOneAndUpdate(
+      {clerkId},
+      {name, username, location, bio, portfolioWebsite},
+      {new: true}
+    )
+
+    revalidatePath(pathname)
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};

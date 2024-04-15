@@ -143,7 +143,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
               </FormLabel>
               <FormControl className="">
                 <Input
-                  className="background-light700_dark400 no-focus paragraph-regular light-border-2 text-dark400_light700 min-h-[56px] border"
+                  className="background-light800_dark300 no-focus paragraph-regular light-border-2 text-dark400_light700 min-h-[56px] border"
                   {...field}
                 />
               </FormControl>
@@ -228,7 +228,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
               <FormControl>
                 <>
                   <Input
-                    className="background-light700_dark400 no-focus paragraph-regular light-border-2 text-dark400_light700 min-h-[56px] border"
+                    className="background-light800_dark300 no-focus paragraph-regular light-border-2 text-dark400_light700 min-h-[56px] border"
                     onKeyDown={(e) => handleInputKeyDown(e, field)}
                     disabled={type === "Edit"}
                   />

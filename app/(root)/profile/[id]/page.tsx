@@ -66,7 +66,7 @@ const Profile = async ({ params: { id }, searchParams }: Props) => {
               />
             </div>
             {result.user.bio && (
-              <p className="text-dark400_light800 paragraph-semibold mt-8">
+              <p className="text-dark400_light800 paragraph-semibold mt-5">
                 {result.user.bio}
               </p>
             )}

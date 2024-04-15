@@ -55,7 +55,6 @@ export const getAnswerById = async ({questionId,}: GetAnswersParams) => {
 export const upvoteAnswer = async ({answerId, userId, hasdownVoted, hasupVoted, path}: AnswerVoteParams) => {
   try {
     await connectToDatabase();
-console.log(answerId);
     let updateQuery = {};
 
     if(hasupVoted) {
