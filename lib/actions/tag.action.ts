@@ -69,3 +69,19 @@ export const getQuestionByTagId = async ({tagId, searchQuery}: GetQuestionsByTag
     throw error;
   }
 };
+
+export const getTopTags = async () => {
+  try {
+    await connectToDatabase();
+
+    const tag = await Tag.find()
+      .sort({questions: - 1})
+      .limit(5)
+    
+    return tag
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+

@@ -223,3 +223,18 @@ export const editQuestion = async ({ questionId, title, content, path, }: EditQu
     throw error;
   }
 };
+
+export const getHotQuestions = async () => {
+  try {
+    await connectToDatabase();
+
+    const question = await Question.find()
+      .sort({views: - 1, upvotes: - 1 })
+      .limit(5)
+    
+    return question
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
