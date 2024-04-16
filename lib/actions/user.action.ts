@@ -98,10 +98,39 @@ export const getAllUser = async ( params: GetAllUsersParams) => {
   try {
     await connectToDatabase();
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { page = 1, pageSize = 20, filter, searchQuery } = params
 
-    const users = await User.find().sort({createdAt: -1})
+    const skipPage = (page - 1) * pageSize;
+
+    let query: FilterQuery<typeof User> = {}
+    if(searchQuery) {
+      query = {
+        $or: [
+          {username: {$regex: new RegExp(searchQuery, "i")} },
+          {name: {$regex: new RegExp(searchQuery, "i")} }
+        ]
+      }
+    }
+
+    let sortOptions = {}
+    switch (filter) {
+      case "new_users":
+        sortOptions = { createdAt: -1}
+        break;
+      case "old_users":
+        sortOptions = { createdAt: -1}
+        break;
+      case "top_contributors":
+        sortOptions = { reputation: -1}
+        break;
+      default:
+        break;
+    }
+
+    const users = await User.find(query)
+      .sort(sortOptions)
+      .skip(skipPage)
+      .limit(pageSize)
 
     return { users };
   } catch (error) {
@@ -146,40 +175,64 @@ export async function toggleSaveQuestion(params: ToggleSaveQuestionParams) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const getSavedQuestion = async ({clerkId, page = 1, filter, pageSize = 20, searchQuery}: GetSavedQuestionsParams) => {
+export async function getSavedQuestions({ clerkId, searchQuery, filter, page = 1, pageSize = 20 }: GetSavedQuestionsParams) {
   try {
-    await connectToDatabase();
+    connectToDatabase();
 
+    // const skipAmount = (page - 1) * pageSize;
+    
     const query: FilterQuery<typeof Question> = searchQuery
       ? { title: { $regex: new RegExp(searchQuery, 'i') } }
       : { };
 
-    const user = await User.findOne({clerkId})
-      .populate({
-        path: "saved",
-        match: query,
-        options: {
-          sort: { createdAt: -1},
-        },
-        populate: [
-          { path: "author", model: User, select: "_id clerkId username name picture"},
-          {path: "tags", model: Tag,select: "_id name"}
-        ]
-      })
+      let sortOptions = {};
+
+      switch (filter) {
+        case "most_recent":
+          sortOptions = { createdAt: -1 }
+          break;
+        case "oldest":
+          sortOptions = { createdAt: 1 }
+          break;
+        case "most_voted":
+          sortOptions = { upvotes: -1 }
+          break;
+        case "most_viewed":
+          sortOptions = { views: -1 }
+          break;
+        case "most_answered":
+          sortOptions = { answers: -1 }
+          break;
+        default:
+          break;
+      }
+
+    const user = await User
+    .findOne({ clerkId })
+    .populate({
+      path: 'saved',
+      match: query,
+      options: {
+        sort: sortOptions,
+      },
+      populate: [
+        { path: 'tags', model: Tag, select: "_id name" },
+        { path: 'author', model: User, select: '_id clerkId name picture'}
+      ]
+    })
     
     if(!user) {
-      throw new Error("User not found")
+      throw new Error('User not found');
     }
 
-    const savedQuestion = user.saved;
+    const savedQuestions = user.saved;
 
-    return { question: savedQuestion }
-
+    return { questions: savedQuestions };
   } catch (error) {
     console.log(error);
     throw error;
   }
-};
+}
 
 export const getUserInfo = async ({userId}: {userId: string}) => {
   try {

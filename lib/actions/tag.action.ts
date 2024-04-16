@@ -2,17 +2,44 @@
 
 import Tag, { ITag } from "@/database/tag.model";
 import { connectToDatabase } from "../mongoose";
-import { GetQuestionsByTagIdParams, GetTopInteractedTagsParams } from "@/types/shared.types";
+import { GetAllTagsParams, GetQuestionsByTagIdParams, GetTopInteractedTagsParams } from "@/types/shared.types";
 import User from "@/database/user.model";
 import Question from "@/database/question.model";
 import Answer from "@/database/answer.model";
 import { FilterQuery } from "mongoose";
 
-export const getAllTags = async () => {
+export const getAllTags = async ({page = 1, pageSize = 20, searchQuery, filter}: GetAllTagsParams) => {
   try {
     await connectToDatabase();
+    const pageSkip = (page - 1) * pageSize;
 
-    const tags = await Tag.find();
+    const query: FilterQuery<typeof Tag> = searchQuery 
+    ? { name: { $regex: new RegExp(searchQuery, 'i') } } 
+    : { };
+
+    let sortOptions = {};
+    switch (filter) {
+      case "popular":
+        sortOptions = { questions: -1 }
+        break;
+      case "recent":
+        sortOptions = { createdAt: -1 }
+        break;
+      case "name":
+        sortOptions = { questions: -1 }
+        break;
+      case "old":
+        sortOptions = { questions: 1 }
+        break;
+    
+      default:
+        break;
+    }
+
+    const tags = await Tag.find(query)
+      .limit(pageSize)
+      .skip(pageSkip)
+      .sort(sortOptions)
 
     return tags;
   } catch (error) {

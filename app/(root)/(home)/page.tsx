@@ -8,14 +8,17 @@ import { Button } from "@/components/ui/button";
 import { HomePageFilters } from "@/constants/filters";
 
 import { getQuestion } from "@/lib/actions/question.action";
+import { SearchParamsProps } from "@/types";
 import { auth } from "@clerk/nextjs";
 import Link from "next/link";
 
-const page = async () => {
+const page = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = auth();
   const result = await getQuestion({
     page: 1,
     pageSize: 20,
+    searchQuery: searchParams.q,
+    filter: "",
   });
 
   return (

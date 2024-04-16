@@ -4,10 +4,16 @@ import UserCard from "@/components/shared/card/UserCard";
 import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
 import { UserFilters } from "@/constants/filters";
 import { getAllUser } from "@/lib/actions/user.action";
+import { SearchParamsProps } from "@/types";
 import React from "react";
 
-const page = async () => {
-  const result = await getAllUser({});
+const page = async ({ searchParams }: SearchParamsProps) => {
+  const result = await getAllUser({
+    page: 1,
+    pageSize: 20,
+    searchQuery: searchParams.q,
+    filter: "",
+  });
 
   return (
     <>
@@ -40,9 +46,8 @@ const page = async () => {
           ))
         ) : (
           <NoResult
-            title="There's no user to show"
-            description="Be the first to break the silence! 🚀 Create a Account and kickstart the
-                discussion."
+            title="There's no users eat."
+            description="Join to be the first 🚀"
             link="/sign-up"
             linkTitle="Create Account"
           />

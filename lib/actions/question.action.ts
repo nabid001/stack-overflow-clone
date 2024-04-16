@@ -9,6 +9,7 @@ import { DeleteQuestionParams, GetQuestionsParams, GetUserStatsParams, QuestionV
 import Answer from "@/database/answer.model";
 import Interaction from "@/database/interactive.model";
 import console from "console";
+import { FilterQuery } from "mongoose";
 
 type CreateQuestionProps = {
   title: string;
@@ -25,16 +26,41 @@ type EditQuestionProps = {
   path: string;
 };
 
-export const getQuestion = async ({page = 1, pageSize = 20 }: GetQuestionsParams) => {
+export const getQuestion = async ({page = 1, pageSize = 20, searchQuery, filter }: GetQuestionsParams) => {
     try {
       await connectToDatabase();
 
       const skip = (page - 1) * pageSize;
+
+      let query: FilterQuery< typeof Question> = {}
+      if(searchQuery) {
+        query = {
+          $or: [
+            {title: {$regex: new RegExp(searchQuery, "i")} },
+            {content: {$regex: new RegExp(searchQuery, "i")} }
+          ]
+        }
+      }
+
+      let sortOptions = {};
+      switch (filter) {
+        case "newest":
+          sortOptions = { createdAt: -1 }
+          break;
+        case "frequent":
+          sortOptions = { views: -1 }
+          break;
+        case "unanswered":
+          query.answers = { $size: 0 }
+          break;
+        default:
+          break;
+      }
   
-      const question = await Question.find()
+      const question = await Question.find(query)
         .populate({ path: "author", model: User })
         .populate({ path: "tags", model: Tag })
-        .sort({ createdAt: -1 })
+        .sort(sortOptions)
         .skip(skip)
         .limit(pageSize);
   

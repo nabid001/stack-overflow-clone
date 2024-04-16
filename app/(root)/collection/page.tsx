@@ -5,14 +5,21 @@ import QuestionCard from "@/components/shared/card/QuestionCard";
 import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
 import { QuestionFilters } from "@/constants/filters";
 
-import { getSavedQuestion } from "@/lib/actions/user.action";
+import { getSavedQuestions } from "@/lib/actions/user.action";
+import { SearchParamsProps } from "@/types";
 import { auth } from "@clerk/nextjs";
 import React from "react";
 
-const Collection = async () => {
+const Collection = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = auth();
   if (!userId) return null;
-  const result = await getSavedQuestion({ clerkId: userId as string });
+  const result = await getSavedQuestions({
+    clerkId: userId as string,
+    page: 1,
+    pageSize: 20,
+    searchQuery: searchParams.q,
+    filter: "",
+  });
 
   return (
     <>
@@ -34,8 +41,8 @@ const Collection = async () => {
       </div>
 
       <div className="mt-11 flex w-full flex-col gap-6">
-        {result?.question?.length > 0 ? (
-          result.question.map((question: any) => (
+        {result?.questions?.length > 0 ? (
+          result.questions.map((question: any) => (
             <QuestionCard
               key={question._id}
               _id={question._id}
