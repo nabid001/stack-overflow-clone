@@ -11,7 +11,7 @@ const page = async ({ searchParams }: SearchParamsProps) => {
     page: 1,
     pageSize: 20,
     searchQuery: searchParams.q,
-    filter: "",
+    filter: searchParams.filter,
   });
   return (
     <>

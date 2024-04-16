@@ -115,15 +115,13 @@ export const getAllUser = async ( params: GetAllUsersParams) => {
     let sortOptions = {}
     switch (filter) {
       case "new_users":
-        sortOptions = { createdAt: -1}
+        sortOptions = { joinedAt: - 1 }
         break;
       case "old_users":
-        sortOptions = { createdAt: -1}
+        sortOptions = { joinedAt: 1 }
         break;
       case "top_contributors":
-        sortOptions = { reputation: -1}
-        break;
-      default:
+        sortOptions = { reputation: - 1 }
         break;
     }
 

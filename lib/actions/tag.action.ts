@@ -23,15 +23,14 @@ export const getAllTags = async ({page = 1, pageSize = 20, searchQuery, filter}:
         sortOptions = { questions: -1 }
         break;
       case "recent":
-        sortOptions = { createdAt: -1 }
+        sortOptions = { createdOn: -1 }
         break;
       case "name":
-        sortOptions = { questions: -1 }
+        sortOptions = { name: 1 }
         break;
       case "old":
-        sortOptions = { questions: 1 }
+        sortOptions = { createdOn: 1 }
         break;
-    
       default:
         break;
     }

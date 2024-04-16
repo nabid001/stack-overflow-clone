@@ -21,6 +21,8 @@ const page = async ({ params: { id }, searchParams }: Props) => {
   const result = await getQuestionByTagId({
     tagId: id,
     searchQuery: searchParams.q,
+    page: 1,
+    pageSize: 20,
   });
 
   return (
