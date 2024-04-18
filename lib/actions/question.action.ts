@@ -30,7 +30,7 @@ export const getQuestion = async ({page = 1, pageSize = 20, searchQuery, filter 
     try {
       await connectToDatabase();
 
-      const skip = (page - 1) * pageSize;
+      const skipAmount = (page - 1) * pageSize;
 
       let query: FilterQuery< typeof Question> = {}
       if(searchQuery) {
@@ -60,11 +60,15 @@ export const getQuestion = async ({page = 1, pageSize = 20, searchQuery, filter 
       const question = await Question.find(query)
         .populate({ path: "author", model: User })
         .populate({ path: "tags", model: Tag })
+        .skip(skipAmount)
+        .limit(pageSize)
         .sort(sortOptions)
-        .skip(skip)
-        .limit(pageSize);
   
-      return { question };
+      const totalQuestions = await Question.countDocuments(query);
+
+      const isNext = totalQuestions > skipAmount + question.length;
+
+      return { question, isNext };
     } catch (error) {
       console.log(error);
       throw error;
@@ -187,7 +191,7 @@ export const downvoteQuestion = async ({questionId, userId, hasdownVoted, hasupV
   }
 }
 
-export const getQuestionByUserId = async ({userId, page = 1, pageSize = 10}: GetUserStatsParams) => {
+export const getQuestionByUserId = async ({userId, page = 1, pageSize = 20}: GetUserStatsParams) => {
   try {
     await connectToDatabase();
 
@@ -202,11 +206,14 @@ export const getQuestionByUserId = async ({userId, page = 1, pageSize = 10}: Get
       .skip(skip)
       .limit(pageSize);
 
+    const isNext = totalQuestions > skip + userQuestions.length;
+
+
     if(!userQuestions) {
       throw new Error("there is no question")
     }
 
-    return {totalQuestions, questions: userQuestions}
+    return {totalQuestions, questions: userQuestions, isNext}
   } catch (error) {
     console.log(error);
     throw error;

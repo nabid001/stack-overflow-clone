@@ -16,9 +16,14 @@ type Props = {
   params: {
     id: string;
   };
+  searchParams: {
+    page: number;
+    q: string;
+    filter: string;
+  };
 };
 
-const page = async ({ params: { id } }: Props) => {
+const page = async ({ params: { id }, searchParams }: Props) => {
   const { userId } = auth();
   const mongouser = await getUserById(userId as string);
   const result = await getQuestionById(id);
@@ -115,6 +120,7 @@ const page = async ({ params: { id } }: Props) => {
         questionId={JSON.stringify(id)}
         userId={mongouser?._id}
         totalAnswers={answers?.length}
+        page={searchParams?.page ? +searchParams.page : 1}
       />
 
       <Answer

@@ -1,6 +1,7 @@
 import HomeFilters from "@/components/home/HomeFilters";
 import Filters from "@/components/shared/Filter";
 import NoResult from "@/components/shared/NoResult";
+import Pagination from "@/components/shared/Pagination";
 import QuestionCard from "@/components/shared/card/QuestionCard";
 
 import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
@@ -15,10 +16,9 @@ import Link from "next/link";
 const page = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = auth();
   const result = await getQuestion({
-    page: 1,
-    pageSize: 20,
     searchQuery: searchParams.q,
     filter: searchParams.filter,
+    page: searchParams.page ? +searchParams.page : 1,
   });
 
   /* TODO: Fetch Recommended question */
@@ -80,8 +80,12 @@ const page = async ({ searchParams }: SearchParamsProps) => {
           />
         )}
       </div>
-
-      {/* Todo: Add pagination here  */}
+      <div className="mt-10">
+        <Pagination
+          isNext={result?.isNext}
+          pageNumber={searchParams?.page ? +searchParams.page : 1}
+        />
+      </div>
     </>
   );
 };

@@ -1,4 +1,5 @@
 import NoResult from "@/components/shared/NoResult";
+import Pagination from "@/components/shared/Pagination";
 import QuestionCard, {
   QuestionProps,
 } from "@/components/shared/card/QuestionCard";
@@ -13,16 +14,15 @@ type Props = {
   };
   searchParams: {
     q: string;
+    page: string;
   };
 };
 
 const page = async ({ params: { id }, searchParams }: Props) => {
-  /* TODO: add searchParams to getQuestionByTagId */
   const result = await getQuestionByTagId({
     tagId: id,
     searchQuery: searchParams.q,
-    page: 1,
-    pageSize: 20,
+    page: searchParams.page ? +searchParams.page : 1,
   });
 
   return (
@@ -62,6 +62,13 @@ const page = async ({ params: { id }, searchParams }: Props) => {
             linkTitle="Ask a Question"
           />
         )}
+      </div>
+
+      <div className="mt-10">
+        <Pagination
+          pageNumber={searchParams.page ? +searchParams.page : 1}
+          isNext={result.isNext}
+        />
       </div>
     </>
   );

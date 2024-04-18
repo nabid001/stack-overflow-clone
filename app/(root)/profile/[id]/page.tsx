@@ -10,16 +10,9 @@ import Stats from "@/components/shared/Stats";
 import QuestionTab from "@/components/shared/QuestionTab";
 import AnswerTab from "@/components/shared/AnswerTab";
 import { redirect } from "next/navigation";
-import { SearchParamsProps } from "@/types";
+import { URLProps } from "@/types";
 
-type Props = {
-  params: {
-    id: string;
-  };
-  searchParams: SearchParamsProps;
-};
-
-const Profile = async ({ params: { id }, searchParams }: Props) => {
+const Profile = async ({ params: { id }, searchParams }: URLProps) => {
   const { userId: clerkId } = auth();
   if (!clerkId) {
     redirect("/sign-up");

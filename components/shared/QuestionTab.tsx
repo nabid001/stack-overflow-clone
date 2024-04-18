@@ -1,20 +1,18 @@
 import { getQuestionByUserId } from "@/lib/actions/question.action";
-import { SearchParamsProps } from "@/types";
-
-import React from "react";
 import NoResult from "./NoResult";
 import QuestionCard from "./card/QuestionCard";
+import Pagination from "./Pagination";
+import { SearchParamsProps } from "@/types";
 
-type Props = {
-  clerkId: string;
+interface Props extends SearchParamsProps {
   userId: string;
-  searchParams: SearchParamsProps;
-};
+  clerkId?: string | null;
+}
 
 const QuestionTab = async ({ clerkId, userId, searchParams }: Props) => {
   const result = await getQuestionByUserId({
     userId,
-    page: 1,
+    page: searchParams.page ? +searchParams.page : 1,
   });
 
   return (
@@ -45,7 +43,12 @@ const QuestionTab = async ({ clerkId, userId, searchParams }: Props) => {
         )}
       </div>
 
-      {result.totalQuestions > 10 && <p>Pagination</p>}
+      <div className="mt-10">
+        <Pagination
+          isNext={result?.isNext}
+          pageNumber={searchParams?.page ? +searchParams.page : 1}
+        />
+      </div>
     </>
   );
 };

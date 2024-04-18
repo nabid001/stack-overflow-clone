@@ -1,18 +1,18 @@
 import { getUserAnswer } from "@/lib/actions/answer.action";
-import { SearchParamsProps } from "@/types";
 
 import AnswerCard from "./card/AnswerCard";
 import NoResult from "./NoResult";
+import Pagination from "./Pagination";
+import { SearchParamsProps } from "@/types";
 
-type Props = {
-  clerkId: string;
+interface Props extends SearchParamsProps {
   userId: string;
-  searchParams: SearchParamsProps;
-};
+  clerkId?: string | null;
+}
 const AnswerTab = async ({ clerkId, userId, searchParams }: Props) => {
   const result = await getUserAnswer({
     userId,
-    page: 1,
+    page: searchParams.page ? +searchParams.page : 1,
   });
 
   return (
@@ -38,6 +38,13 @@ const AnswerTab = async ({ clerkId, userId, searchParams }: Props) => {
             linkTitle="Explore"
           />
         )}
+      </div>
+
+      <div className="mt-10">
+        <Pagination
+          isNext={result?.isNext}
+          pageNumber={searchParams?.page ? +searchParams.page : 1}
+        />
       </div>
     </>
   );

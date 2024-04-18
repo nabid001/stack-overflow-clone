@@ -94,11 +94,9 @@ export async function deleteUser(params: DeleteUserParams) {
   }
 }
 
-export const getAllUser = async ( params: GetAllUsersParams) => {
+export const getAllUser = async ( { page = 1, pageSize = 20, filter, searchQuery }: GetAllUsersParams) => {
   try {
     await connectToDatabase();
-
-    const { page = 1, pageSize = 20, filter, searchQuery } = params
 
     const skipPage = (page - 1) * pageSize;
 
@@ -125,12 +123,16 @@ export const getAllUser = async ( params: GetAllUsersParams) => {
         break;
     }
 
+    
     const users = await User.find(query)
-      .sort(sortOptions)
-      .skip(skipPage)
-      .limit(pageSize)
+    .sort(sortOptions)
+    .skip(skipPage)
+    .limit(pageSize)
+    
+    const totalUsers = await User.countDocuments(query);
+    const isNext = totalUsers > skipPage + users.length
 
-    return { users };
+    return { users, isNext };
   } catch (error) {
     console.log(error);
     throw error;
@@ -172,12 +174,11 @@ export async function toggleSaveQuestion(params: ToggleSaveQuestionParams) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function getSavedQuestions({ clerkId, searchQuery, filter, page = 1, pageSize = 20 }: GetSavedQuestionsParams) {
   try {
     connectToDatabase();
 
-    // const skipAmount = (page - 1) * pageSize;
+    const skipAmount = (page - 1) * pageSize;
     
     const query: FilterQuery<typeof Question> = searchQuery
       ? { title: { $regex: new RegExp(searchQuery, 'i') } }
@@ -212,12 +213,16 @@ export async function getSavedQuestions({ clerkId, searchQuery, filter, page = 1
       match: query,
       options: {
         sort: sortOptions,
+        skip: skipAmount,
+        limit: pageSize + 1,
       },
       populate: [
         { path: 'tags', model: Tag, select: "_id name" },
         { path: 'author', model: User, select: '_id clerkId name picture'}
       ]
     })
+
+    const isNext = user.saved.length > pageSize
     
     if(!user) {
       throw new Error('User not found');
@@ -225,7 +230,7 @@ export async function getSavedQuestions({ clerkId, searchQuery, filter, page = 1
 
     const savedQuestions = user.saved;
 
-    return { questions: savedQuestions };
+    return { questions: savedQuestions, isNext};
   } catch (error) {
     console.log(error);
     throw error;

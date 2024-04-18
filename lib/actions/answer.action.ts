@@ -34,18 +34,27 @@ export const createAnswer = async ({ content, author, question, path, }: Props) 
   }
 };
 
-export const getAnswerById = async ({questionId,}: GetAnswersParams) => {
+export const getAnswerById = async ({questionId, page = 1, pageSize = 10}: GetAnswersParams) => {
   try {
     await connectToDatabase();
 
-    const answers = await Answer.find({question: questionId}).populate({
+    const skipAmount = (page - 1) * pageSize;
+
+    const answers = await Answer.find({question: questionId})
+    .populate({
       path: "author",
       model: User,
       select: "_id name clerkId picture",
     })
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .skip(skipAmount)
+    .limit(pageSize);
+  
 
-    return {answers}
+    const totalAnswers = await Answer.countDocuments({question: questionId});
+    const isNext = totalAnswers > skipAmount + answers.length;
+
+    return {answers, isNext}
   } catch (error) {
     console.log(error);
     throw error;
@@ -121,7 +130,7 @@ export const downvoteAnswer = async ({answerId, userId, hasdownVoted, hasupVoted
   }
 }
 
-export const getUserAnswer = async ({userId, page = 1, pageSize = 10}: GetUserStatsParams) => {
+export const getUserAnswer = async ({userId, page = 1, pageSize = 20}: GetUserStatsParams) => {
   try {
     await connectToDatabase();
 
@@ -136,11 +145,13 @@ export const getUserAnswer = async ({userId, page = 1, pageSize = 10}: GetUserSt
       .skip(skip)
       .limit(pageSize);
 
+    const isNext = totalAnswers > skip + userAnswers.length;
+
     if(!userAnswers) {
       throw new Error("there is no answers")
     }
 
-    return {totalAnswers, answers: userAnswers}
+    return {totalAnswers, answers: userAnswers, isNext}
   } catch (error) {
     console.log(error);
     throw error;

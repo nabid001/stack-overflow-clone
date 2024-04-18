@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Filters from "@/components/shared/Filter";
 import NoResult from "@/components/shared/NoResult";
+import Pagination from "@/components/shared/Pagination";
 import QuestionCard from "@/components/shared/card/QuestionCard";
 import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
 import { QuestionFilters } from "@/constants/filters";
@@ -8,15 +9,14 @@ import { QuestionFilters } from "@/constants/filters";
 import { getSavedQuestions } from "@/lib/actions/user.action";
 import { SearchParamsProps } from "@/types";
 import { auth } from "@clerk/nextjs";
-import React from "react";
 
 const Collection = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = auth();
   if (!userId) return null;
+
   const result = await getSavedQuestions({
     clerkId: userId as string,
-    page: 1,
-    pageSize: 20,
+    page: searchParams.page ? +searchParams.page : 1,
     searchQuery: searchParams.q,
     filter: searchParams.filter,
   });
@@ -63,6 +63,13 @@ const Collection = async ({ searchParams }: SearchParamsProps) => {
             linkTitle="Explore Questions"
           />
         )}
+      </div>
+
+      <div className="mt-10">
+        <Pagination
+          pageNumber={searchParams.page ? +searchParams.page : 1}
+          isNext={result.isNext}
+        />
       </div>
     </>
   );
