@@ -28,8 +28,6 @@ const AllAnswers = async ({
     page: page ? +page : 1,
   });
 
-  console.log(result);
-
   return (
     <div className="mt-11">
       <div className="flex items-center justify-between">
