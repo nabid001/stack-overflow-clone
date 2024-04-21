@@ -75,6 +75,7 @@ export const getQuestion = async ({page = 1, pageSize = 20, searchQuery, filter 
     }
   };
   
+// reputation.
 export const createQuestion = async ({ title, content, tags, author, path,
 }: CreateQuestionProps) => {
   try {
@@ -101,6 +102,12 @@ export const createQuestion = async ({ title, content, tags, author, path,
       $push: { tags: { $each: tagDocument } },
     });
 
+    await User.findByIdAndUpdate(
+      author,
+      { $inc: { reputation: 5}},
+      { new: true }
+    )
+
     revalidatePath(path);
   } catch (error) {
     console.log(error);
@@ -122,7 +129,7 @@ export const getQuestionById = async (id: string) => {
     throw error
   }
 }
-
+// reputation
 export const upvoteQuestion = async ({questionId, userId, hasdownVoted, hasupVoted, path}: QuestionVoteParams ) => {
   try {
     await connectToDatabase();
@@ -148,6 +155,36 @@ export const upvoteQuestion = async ({questionId, userId, hasdownVoted, hasupVot
       throw new Error("there is no question")
     }
 
+    // if the user hasn't already voted then increase reputation by +1 or if the user remove the vote then decrease reputation by -1 
+    if(!hasupVoted) {
+      await User.findByIdAndUpdate(
+        userId,
+        { $inc: { reputation: 1}},
+        { new: true }
+      )
+    } else if(hasupVoted) {
+      await User.findByIdAndUpdate(
+        userId,
+        { $inc: { reputation: -1}},
+        { new: true }
+      )
+    }
+    
+    // if the user receiving an upvote from another user then increase reputation by +10 or if the user remove the vote then decrease reputation by -10
+    if(!hasupVoted && userId !== question.author) {
+      await User.findByIdAndUpdate(
+        question.author,
+        { $inc: { reputation: 10}},
+        { new: true }
+      )
+    } else if(hasupVoted && userId !== question.author) {
+      await User.findByIdAndUpdate(
+        question.author,
+        { $inc: { reputation: -10}},
+        { new: true }
+      )
+    }
+
     revalidatePath(path);
 
     return question
@@ -156,7 +193,7 @@ export const upvoteQuestion = async ({questionId, userId, hasdownVoted, hasupVot
     throw error
   }
 }
-
+// reputation
 export const downvoteQuestion = async ({questionId, userId, hasdownVoted, hasupVoted, path}: QuestionVoteParams ) => {
   try {
     await connectToDatabase();
@@ -171,7 +208,7 @@ export const downvoteQuestion = async ({questionId, userId, hasdownVoted, hasupV
         $push: { downvotes: userId}
       }
     } else {
-      updateQuery = { $addToSet: { upvotes: userId }};
+      updateQuery = { $addToSet: { downvotes: userId }};
     }
 
     const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
@@ -180,6 +217,36 @@ export const downvoteQuestion = async ({questionId, userId, hasdownVoted, hasupV
 
     if(!question) {
       throw new Error("there is no question")
+    }
+
+    // if the user hasn't already down voted then increase reputation by -1 or if the user remove the vote then decrease reputation by 1 
+    if(!hasdownVoted) {
+      await User.findByIdAndUpdate(
+        userId,
+        { $inc: { reputation: -1}},
+        { new: true }
+      )
+    } else if(hasdownVoted) {
+      await User.findByIdAndUpdate(
+        userId,
+        { $inc: { reputation: 1}},
+        { new: true }
+      )
+    }
+
+    // if the user receiving an down upvote from another user then increase reputation by -2 or if the user remove the vote then decrease reputation by 2
+    if(!hasdownVoted && userId !== question.author) {
+      await User.findByIdAndUpdate(
+        question.author,
+        { $inc: { reputation: -2}},
+        { new: true }
+      )
+    } else if(hasdownVoted && userId !== question.author) {
+      await User.findByIdAndUpdate(
+        question.author,
+        { $inc: { reputation: 2}},
+        { new: true }
+      )
     }
 
     revalidatePath(path);
