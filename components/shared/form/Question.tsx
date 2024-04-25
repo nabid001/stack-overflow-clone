@@ -278,7 +278,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <>{type === "Edit" ? "Posting..." : "Editing..."}</>
+            <>{type === "Edit" ? "Editing..." : "Posting..."}</>
           ) : (
             <>{type === "Edit" ? "Update Question" : "Ask a Question"}</>
           )}

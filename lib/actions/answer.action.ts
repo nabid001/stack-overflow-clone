@@ -139,7 +139,7 @@ export const getUserAnswer = async ({userId, page = 1, pageSize = 20}: GetUserSt
     const skip = (page - 1) * pageSize;
 
     const userAnswers = await Answer.find({ author: userId })
-      .sort({ upvotes: - 1 })
+      .sort({ createdAt: -1 , upvotes: - 1 })
       .populate({ path: "author", model: User, select: "_id name clerkId name picture" })
       .populate({ path: "question", model: Question, select: "_id title" })
       .skip(skip)

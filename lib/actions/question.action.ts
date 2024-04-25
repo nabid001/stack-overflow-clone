@@ -102,11 +102,14 @@ export const createQuestion = async ({ title, content, tags, author, path,
       $push: { tags: { $each: tagDocument } },
     });
 
-    await User.findByIdAndUpdate(
-      author,
-      { $inc: { reputation: 5}},
-      { new: true }
-    )
+    await Interaction.create({
+      user: author,
+      action: "question",
+      question: question._id,
+      tags: tagDocument
+    })
+
+    await User.findByIdAndUpdate(author, { $inc: { reputation: 5 } })
 
     revalidatePath(path);
   } catch (error) {
@@ -156,34 +159,41 @@ export const upvoteQuestion = async ({questionId, userId, hasdownVoted, hasupVot
     }
 
     // if the user hasn't already voted then increase reputation by +1 or if the user remove the vote then decrease reputation by -1 
-    if(!hasupVoted) {
-      await User.findByIdAndUpdate(
-        userId,
-        { $inc: { reputation: 1}},
-        { new: true }
-      )
-    } else if(hasupVoted) {
-      await User.findByIdAndUpdate(
-        userId,
-        { $inc: { reputation: -1}},
-        { new: true }
-      )
-    }
+    // if(!hasupVoted) {
+    //   await User.findByIdAndUpdate(
+    //     userId,
+    //     { $inc: { reputation: 1}},
+    //     { new: true }
+    //   )
+    // } else if(hasupVoted) {
+    //   await User.findByIdAndUpdate(
+    //     userId,
+    //     { $inc: { reputation: -1}},
+    //     { new: true }
+    //   )
+    // }
+
+    await User.findByIdAndUpdate(
+      userId,
+      { $inc: { reputation: hasupVoted ? -1 : 1 }},
+    )
     
     // if the user receiving an upvote from another user then increase reputation by +10 or if the user remove the vote then decrease reputation by -10
-    if(!hasupVoted && userId !== question.author) {
-      await User.findByIdAndUpdate(
-        question.author,
-        { $inc: { reputation: 10}},
-        { new: true }
-      )
-    } else if(hasupVoted && userId !== question.author) {
-      await User.findByIdAndUpdate(
-        question.author,
-        { $inc: { reputation: -10}},
-        { new: true }
-      )
-    }
+    // if(!hasupVoted && userId !== question.author) {
+    //   await User.findByIdAndUpdate(
+    //     question.author,
+    //     { $inc: { reputation: 10}},
+    //     { new: true }
+    //   )
+    // } else if(hasupVoted && userId !== question.author) {
+    //   await User.findByIdAndUpdate(
+    //     question.author,
+    //     { $inc: { reputation: -10}},
+    //     { new: true }
+    //   )
+    // }
+
+    await User.findByIdAndUpdate(question.author, { $inc: { reputation: hasupVoted && userId !== question.author ? -10 : 10} })
 
     revalidatePath(path);
 
@@ -220,34 +230,40 @@ export const downvoteQuestion = async ({questionId, userId, hasdownVoted, hasupV
     }
 
     // if the user hasn't already down voted then increase reputation by -1 or if the user remove the vote then decrease reputation by 1 
-    if(!hasdownVoted) {
-      await User.findByIdAndUpdate(
-        userId,
-        { $inc: { reputation: -1}},
-        { new: true }
-      )
-    } else if(hasdownVoted) {
-      await User.findByIdAndUpdate(
-        userId,
-        { $inc: { reputation: 1}},
-        { new: true }
-      )
-    }
+    // if(!hasdownVoted) {
+    //   await User.findByIdAndUpdate(
+    //     userId,
+    //     { $inc: { reputation: -1}},
+    //     { new: true }
+    //   )
+    // } else if(hasdownVoted) {
+    //   await User.findByIdAndUpdate(
+    //     userId,
+    //     { $inc: { reputation: 1}},
+    //     { new: true }
+    //   )
+    // }
+    await User.findByIdAndUpdate(
+      userId,
+      { $inc: { reputation: hasdownVoted ? 1 : -1 }},
+    )
 
     // if the user receiving an down upvote from another user then increase reputation by -2 or if the user remove the vote then decrease reputation by 2
-    if(!hasdownVoted && userId !== question.author) {
-      await User.findByIdAndUpdate(
-        question.author,
-        { $inc: { reputation: -2}},
-        { new: true }
-      )
-    } else if(hasdownVoted && userId !== question.author) {
-      await User.findByIdAndUpdate(
-        question.author,
-        { $inc: { reputation: 2}},
-        { new: true }
-      )
-    }
+    // if(!hasdownVoted && userId !== question.author) {
+    //   await User.findByIdAndUpdate(
+    //     question.author,
+    //     { $inc: { reputation: -2}},
+    //     { new: true }
+    //   )
+    // } else if(hasdownVoted && userId !== question.author) {
+    //   await User.findByIdAndUpdate(
+    //     question.author,
+    //     { $inc: { reputation: 2}},
+    //     { new: true }
+    //   )
+    // }
+    
+    await User.findByIdAndUpdate(question.author, { $inc: { reputation: hasdownVoted && userId !== question.author ? 2 : -2} })
 
     revalidatePath(path);
 
@@ -267,7 +283,7 @@ export const getQuestionByUserId = async ({userId, page = 1, pageSize = 20}: Get
     const skip = (page - 1) * pageSize;
 
     const userQuestions = await Question.find({ author: userId })
-      .sort({ views: -1, upvotes: -1 })
+      .sort({ createdAt: -1 , views: -1, upvotes: -1 })
       .populate({ path: "tags", model: Tag, select: "_id name" })
       .populate({ path: "author", model: User, select: "_id name clerkId name picture" })
       .skip(skip)
