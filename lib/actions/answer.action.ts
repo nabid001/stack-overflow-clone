@@ -21,12 +21,22 @@ export const createAnswer = async ({ content, author, question, path, }: Props) 
 
     const newAnswer = await Answer.create({ content, author, question,});
 
-    await Question.findByIdAndUpdate(question, {
+    const questionObject = await Question.findByIdAndUpdate(question, {
       $push: { answers: newAnswer._id },
     });
 
-    // TODO: Add interaction...
-
+    
+    await User.findByIdAndUpdate(author, {
+      $inc: { reputation: 10}
+    })
+    
+    await Interaction.create({
+      user: author,
+      action: "answer",
+      question,
+      answer: newAnswer._id,
+      tags: questionObject.tags
+    });
     revalidatePath(path);
   } catch (error) {
     console.log(error);
@@ -85,6 +95,14 @@ export const upvoteAnswer = async ({answerId, userId, hasdownVoted, hasupVoted, 
       throw new Error("Answer not found")
     };
 
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasupVoted ? -2 : 2}
+    })
+
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasupVoted ? -10 : 10}
+    })
+
     revalidatePath(path);
 
     return answer
@@ -109,7 +127,7 @@ export const downvoteAnswer = async ({answerId, userId, hasdownVoted, hasupVoted
         $push: { downvotes: userId}
       }
     } else {
-      updateQuery = { $addToSet: { upvotes: userId }};
+      updateQuery = { $addToSet: { downvotes: userId }};
     }
 
     const answer = await Answer.findByIdAndUpdate(answerId, updateQuery, {
@@ -119,6 +137,15 @@ export const downvoteAnswer = async ({answerId, userId, hasdownVoted, hasupVoted
     if(!answer) {
       throw new Error("Answer not found")
     };
+
+    // update user reputation
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasdownVoted ? 2 : -2}
+    })
+
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasdownVoted ? 2 : -2}
+    })
 
     revalidatePath(path);
 
