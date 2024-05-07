@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SidebarLink } from "@/types";
 
 export const themes = [
@@ -71,3 +72,4 @@ export const BADGE_CRITERIA = {
     GOLD: 100000,
   },
 };
+

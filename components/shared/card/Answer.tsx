@@ -23,13 +23,16 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 type Props = {
+  question: string;
   authorId: string;
   questionId: string;
 };
 
-const Answer = ({ authorId, questionId }: Props) => {
+const Answer = ({ authorId, questionId, question }: Props) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isSubmittingAI, setIsSubmittingAI] = useState(false);
   const { mode } = useTheme();
   const editorRef = useRef(null);
 
@@ -72,6 +75,40 @@ const Answer = ({ authorId, questionId }: Props) => {
       setIsSubmitting(false);
     }
   }
+
+  const generateAIAnswer = async () => {
+    if (!authorId) return;
+
+    setIsSubmittingAI(true);
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/chatgpt`,
+        {
+          method: "POST",
+          body: JSON.stringify({ question }),
+        }
+      );
+
+      const aiAnswer = await response.json();
+
+      // Convert plain text to HTML format
+
+      const formattedAnswer = aiAnswer.reply.replace(/\n/g, "<br />");
+
+      if (editorRef.current) {
+        const editor = editorRef.current as any;
+        editor.setContent(formattedAnswer);
+      }
+
+      // Toast...
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsSubmittingAI(false);
+    }
+  };
+
   return (
     <div className="mt-11">
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
@@ -80,7 +117,8 @@ const Answer = ({ authorId, questionId }: Props) => {
         </h4>
 
         <Button
-          onClick={() => {}}
+          onClick={generateAIAnswer}
+          disabled={true}
           className="btn light-border-2 gap-1.5 rounded-md px-4 py-2.5 text-primary-500 shadow-none dark:text-primary-500"
         >
           <Image

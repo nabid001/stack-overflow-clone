@@ -126,6 +126,7 @@ const page = async ({ params: { id }, searchParams }: Props) => {
       <Answer
         questionId={JSON.stringify(_id)}
         authorId={JSON.stringify(mongouser?._id)}
+        question={title}
       />
     </>
   );
