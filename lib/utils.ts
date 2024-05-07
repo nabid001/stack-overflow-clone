@@ -4,8 +4,6 @@ import { twMerge } from "tailwind-merge";
 import qs from "query-string";
 import { BADGE_CRITERIA } from "@/constants";
 import { BadgeCounts } from "@/types";
-import OpenAI from 'openai';
-
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
