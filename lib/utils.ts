@@ -127,9 +127,3 @@ export const assignBadges = (params: BadgeParam) => {
 
   return badgeCounts;
 };
-
-
-export const openai = new OpenAI({
-  apiKey: 'sk-proj-QLnlV5eiwSiaFLBZ7bIMT3BlbkFJ26XgIiPs4GGvNj3EMVHV',
-  dangerouslyAllowBrowser: true
-});
