@@ -12,6 +12,13 @@ import { getQuestion } from "@/lib/actions/question.action";
 import { SearchParamsProps } from "@/types";
 import { auth } from "@clerk/nextjs";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Home | DevFlow",
+  description:
+    "DevFlow is a place where developers can ask questions and get answers.",
+};
 
 const page = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = auth();

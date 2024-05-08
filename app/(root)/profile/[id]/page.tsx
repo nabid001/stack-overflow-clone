@@ -11,6 +11,11 @@ import QuestionTab from "@/components/shared/QuestionTab";
 import AnswerTab from "@/components/shared/AnswerTab";
 import { redirect } from "next/navigation";
 import { URLProps } from "@/types";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Profile | DevFlow",
+};
 
 const Profile = async ({ params: { id }, searchParams }: URLProps) => {
   const { userId: clerkId } = auth();
