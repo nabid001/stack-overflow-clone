@@ -8,7 +8,7 @@ import { QuestionFilters } from "@/constants/filters";
 
 import { getSavedQuestions } from "@/lib/actions/user.action";
 import { SearchParamsProps } from "@/types";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 const Collection = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = auth();

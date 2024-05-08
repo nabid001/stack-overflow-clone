@@ -1,6 +1,6 @@
 import React from "react";
 import Profile from "@/components/shared/form/Profile";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { getUserById } from "@/lib/actions/user.action";
 
 const ProfileEdit = async () => {
