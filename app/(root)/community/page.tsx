@@ -7,13 +7,6 @@ import { UserFilters } from "@/constants/filters";
 import { getAllUser } from "@/lib/actions/user.action";
 import { SearchParamsProps } from "@/types";
 import React from "react";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Community | DevFlow",
-  description:
-    "Meet with the best brains on DevFlow community. Share your knowledge and learn from others.",
-};
 
 const page = async ({ searchParams }: SearchParamsProps) => {
   const result = await getAllUser({

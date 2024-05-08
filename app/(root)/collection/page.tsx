@@ -9,12 +9,6 @@ import { QuestionFilters } from "@/constants/filters";
 import { getSavedQuestions } from "@/lib/actions/user.action";
 import { SearchParamsProps } from "@/types";
 import { auth } from "@clerk/nextjs";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Collection | DevFlow",
-  description: "You can save the best questions in your collection",
-};
 
 const Collection = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = auth();
