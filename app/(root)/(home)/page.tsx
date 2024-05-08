@@ -10,7 +10,7 @@ import { HomePageFilters } from "@/constants/filters";
 
 import { getQuestion } from "@/lib/actions/question.action";
 import { SearchParamsProps } from "@/types";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 
 const page = async ({ searchParams }: SearchParamsProps) => {
