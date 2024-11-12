@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { getUserInfo } from "@/lib/actions/user.action";
+import { fetchAllUser, getUserInfo } from "@/lib/actions/user.action";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,6 +12,15 @@ import AnswerTab from "@/components/shared/AnswerTab";
 import { redirect } from "next/navigation";
 import { URLProps } from "@/types";
 import { SignedIn } from "@clerk/nextjs";
+
+export const revalidate = 60;
+export async function generateStaticParams() {
+  const users = await fetchAllUser();
+
+  return users.map((user: { clerkId: string }) => ({
+    id: user.clerkId,
+  }));
+}
 
 const Profile = async ({ params: { id }, searchParams }: URLProps) => {
   const { userId: clerkId } = auth();
